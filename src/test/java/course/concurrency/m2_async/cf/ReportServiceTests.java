@@ -1,5 +1,6 @@
 package course.concurrency.m2_async.cf;
 
+import course.concurrency.m2_async.loadTest.ReportServiceCF;
 import course.concurrency.m2_async.loadTest.ReportServiceExecutors;
 import org.junit.jupiter.api.Test;
 
@@ -10,8 +11,8 @@ import java.util.concurrent.TimeUnit;
 
 public class ReportServiceTests {
 
-    private ReportServiceExecutors reportService = new ReportServiceExecutors();
-//    private ReportServiceCF reportService = new ReportServiceCF();
+//    private ReportServiceExecutors reportService = new ReportServiceExecutors();
+    private ReportServiceCF reportService = new ReportServiceCF();
 //    private ReportServiceVirtual reportService = new ReportServiceVirtual();
 
     @Test
@@ -24,9 +25,12 @@ public class ReportServiceTests {
 
         for (int i = 0; i < poolSize; i++) {
             executor.submit(() -> {
+                System.out.println("inside");
                 try {
+                    System.out.println("inside 1");
                     latch.await();
                 } catch (InterruptedException ignored) {}
+                System.out.println("inside 2");
                 for (int it = 0; it < iterations; it++) {
                     reportService.getReport();
                 }

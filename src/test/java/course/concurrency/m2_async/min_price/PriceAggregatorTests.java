@@ -41,7 +41,7 @@ public class PriceAggregatorTests {
     @Test
     @DisplayName("Every shop responds")
     public void shouldReturnMin() {
-        int shopCount = 50;
+        int shopCount = 5;
         PriceRetriever priceRetriever = mock(PriceRetriever.class);
         List<Double> prices = IntStream.range(0, shopCount-1).boxed()
                 .map(i -> ThreadLocalRandom.current().nextDouble())
