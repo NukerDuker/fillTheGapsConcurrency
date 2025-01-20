@@ -94,6 +94,7 @@ public class PriceAggregatorTests {
 
         when(priceRetriever.getPrice(anyLong(), anyLong())).thenAnswer(inv -> {
             if (totalRequestCount.getAndIncrement() < half) {
+                System.out.println("sending request and request count: " + totalRequestCount.get());
                 Thread.sleep(SLA * 2);
                 return null;
             } else {
@@ -109,6 +110,7 @@ public class PriceAggregatorTests {
         double min = priceAggregator.getMinPrice(randomItemId);
         long end = System.currentTimeMillis();
 
+        System.out.println("prices : " + prices);
         double expectedMin = prices.stream().min(Double::compareTo).orElse(Double.NaN);
         assertEquals(expectedMin, min, "Minimal price is evaluated incorrectly");
         assertTrue((end - start) < SLA, "Method evaluated too long");
