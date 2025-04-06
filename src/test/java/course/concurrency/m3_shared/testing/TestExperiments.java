@@ -2,6 +2,9 @@ package course.concurrency.m3_shared.testing;
 
 import org.junit.jupiter.api.RepeatedTest;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestExperiments {
@@ -19,16 +22,19 @@ public class TestExperiments {
         }
     }
 
-    @RepeatedTest(100)
+    @RepeatedTest(1000)
     public void counterShouldFail() {
-        int iterations = 5;
+        int threadCount = Runtime.getRuntime().availableProcessors()*3;
+        int iterations = 200;
 
         Counter counter = new Counter();
-
-        for (int i = 0; i < iterations; i++) {
-            counter.increment();
+        try (ExecutorService executor = Executors.newFixedThreadPool(threadCount)) {
+            for (int i = 0; i < iterations; i++) {
+                executor.submit(() -> {
+                    counter.increment();
+                });
+            }
         }
-
         assertEquals(iterations, counter.get());
     }
 }
