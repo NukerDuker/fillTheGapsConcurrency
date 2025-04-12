@@ -21,7 +21,7 @@ public class CustomBlockingQueue<T> {
             wait();
         }
         this.quantity++;
-        this.queue.add(item);
+        this.queue.addLast(item);
         if (this.quantity == this.size) this.isFull = true;
     }
 
@@ -29,7 +29,7 @@ public class CustomBlockingQueue<T> {
         if (!queue.isEmpty()) {
             if (this.isFull) this.isFull = false;
             this.quantity--;
-            T removed = queue.remove(quantity);
+            T removed = queue.removeFirst();
             notify();
             return removed;
         }

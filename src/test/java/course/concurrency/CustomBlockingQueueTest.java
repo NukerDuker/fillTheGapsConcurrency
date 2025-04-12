@@ -1,12 +1,16 @@
 package course.concurrency;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicIntegerArray;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -40,7 +44,7 @@ class CustomBlockingQueueTest {
         for (int i = 0; i < 10; i++) {
             queue.enqueue(i);
         }
-        for (int i = 9; i >= 0; i--) {
+        for (int i = 0; i < 10; i++) {
             assertEquals(i, queue.dequeue());
         }
         assertNull(queue.dequeue());
@@ -70,10 +74,12 @@ class CustomBlockingQueueTest {
     }
 
     @Test
-    void multiThreadOversizedQueue() throws InterruptedException {
+    void multiThreadOversizeQueue() throws InterruptedException {
         CustomBlockingQueue<Integer> queue = new CustomBlockingQueue<>(10);
+        List<Integer> list = new LinkedList<>();
         for (int i = 0; i < 10; i++) {
             queue.enqueue(i);
+            list.add(i);
         }
         CountDownLatch latch = new CountDownLatch(1);
         CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
@@ -88,7 +94,27 @@ class CustomBlockingQueueTest {
         queue.dequeue();
         latch.await();
         assertEquals(10, queue.getQuantity());
-
+        ExecutorService executor = Executors.newFixedThreadPool(10);
+        List<Integer> finalList = new LinkedList<>();
+        CountDownLatch latch2 = new CountDownLatch(10);
+        for (int i = 0; i < 10; i++) {
+            int finalI = i;
+            executor.execute(() -> {
+                try {
+                    synchronized (finalList) {
+                        int r = queue.dequeue();
+                        finalList.add(finalI);
+                        latch2.countDown();
+                    }
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        }
+        latch2.await();
+        for (int i = 0; i < 10; i++) {
+            assertEquals(i, finalList.removeFirst());
+        }
     }
 
 }
