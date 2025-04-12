@@ -7,7 +7,7 @@ public class CustomBlockingQueue<T> {
 
     private volatile List<T> queue;
     private volatile int size;
-    private volatile int lastIndex = 0;
+    private volatile int quantity = 0;
     private volatile boolean isFull;
 
     CustomBlockingQueue(int size) {
@@ -17,23 +17,27 @@ public class CustomBlockingQueue<T> {
 
 
     public synchronized void enqueue(T item) throws InterruptedException {
-        if (this.isFull) {
-            this.wait();
-        } else {
-            this.lastIndex++;
-            this.queue.add(item);
-            if (this.lastIndex == this.size - 1) this.isFull = true;
+        while (this.isFull) {
+            wait();
         }
+        this.quantity++;
+        this.queue.add(item);
+        if (this.quantity == this.size) this.isFull = true;
     }
 
     public synchronized T dequeue() throws InterruptedException {
         if (!queue.isEmpty()) {
-            this.notify();
             if (this.isFull) this.isFull = false;
-            this.lastIndex--;
-            return queue.remove(lastIndex);
+            this.quantity--;
+            T removed = queue.remove(quantity);
+            notify();
+            return removed;
         }
         return null;
+    }
+
+    public synchronized int getQuantity() {
+        return this.quantity;
     }
 
 }
