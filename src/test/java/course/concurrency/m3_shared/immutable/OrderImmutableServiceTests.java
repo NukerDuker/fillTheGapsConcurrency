@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class OrderImmutableServiceTests {
 
-    private OrderService service = new OrderService();
+    private OrderServiceImmutable service = new OrderServiceImmutable();
 
     private List<Item> items = List.of(new Item(), new Item());
 
