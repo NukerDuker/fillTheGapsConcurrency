@@ -9,7 +9,7 @@ import java.util.concurrent.*;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class OrderServiceTests {
+public class OrderImmutableServiceTests {
 
     private OrderService service = new OrderService();
 
